@@ -1,32 +1,50 @@
-# Environment variables
-.env
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
 venv/
 env/
-
-# Reports and logs
-reports/*.json
-logs/*.log
-
-reports_langchain/*.json
-reports_langchain/*.txt
+ENV/
+.venv/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Temporary files
-*.tmp
+# Project specific
+archive_*/
+logs/
+reports/
+data/
+*.log
+.env
 *.bak
+
+# Streamlit
+.streamlit/

@@ -22,15 +22,13 @@ def print_banner():
 def show_menu():
     """Show main menu"""
     print("\nSelect an option:")
-    print("1. 🚀 Run Enhanced Multi-Agent Analysis (Full CrewAI functionality)")
-    print("2. 🔍 Run Interactive Analysis with Web Search")
-    print("3. 📊 Run Modern KYC Analysis")
-    print("4. 🎯 Run Simple KYC Analysis")
-    print("5. 📋 View Documentation")
-    print("6. 🔧 Check System Status")
+    print("1. 🔍 Run Interactive Analysis with Web Search")
+    print("2. 🌐 Run Web UI (Streamlit)")
+    print("3. 📋 View Documentation")
+    print("4. 🔧 Check System Status")
     print("0. Exit")
     
-    return input("\nEnter your choice (0-6): ")
+    return input("\nEnter your choice (0-4): ")
 
 
 def main():
@@ -41,33 +39,31 @@ def main():
         choice = show_menu()
         
         if choice == "1":
-            print("\n🚀 Starting Enhanced Multi-Agent Analysis...")
-            from kyc_enhanced import main as enhanced_main
-            enhanced_main()
-            
-        elif choice == "2":
             print("\n🔍 Starting Interactive Analysis...")
             from kyc_interactive import main as interactive_main
             interactive_main()
             
+        elif choice == "2":
+            print("\n🌐 Starting Web UI...")
+            print("\nThe web interface will open in your browser at http://localhost:8501")
+            print("Press Ctrl+C to stop the server\n")
+            import subprocess
+            try:
+                subprocess.run(["streamlit", "run", "streamlit_app.py"])
+            except KeyboardInterrupt:
+                print("\n\nWeb UI stopped.")
+            except FileNotFoundError:
+                print("\n❌ Streamlit not found. Please install requirements:")
+                print("   pip install -r requirements.txt")
+            
         elif choice == "3":
-            print("\n📊 Starting Modern KYC Analysis...")
-            from kyc_modern import main as modern_main
-            modern_main()
-            
-        elif choice == "4":
-            print("\n🎯 Starting Simple KYC Analysis...")
-            from kyc_simple import main as simple_main
-            simple_main()
-            
-        elif choice == "5":
             print("\n📋 Documentation:")
             print("  - README.md: General project overview")
-            print("  - README_LANGCHAIN.md: LangChain implementation details")
+            print("  - UI_README.md: Web UI documentation")
             print("  - INTERACTIVE_KYC_GUIDE.md: Interactive system guide")
             print("  - PROJECT_SUMMARY.md: Complete project summary")
             
-        elif choice == "6":
+        elif choice == "4":
             print("\n🔧 Checking system status...")
             import requests
             
