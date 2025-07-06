@@ -1,317 +1,149 @@
-# KYC Analysis with CrewAI
+# KYC Analysis System
 
-An automated Know Your Customer (KYC) solution built on the CrewAI platform for Swiss banking compliance. This system uses AI agents to perform comprehensive due diligence on potential bank clients, including PEP screening, sanctions checks, and risk assessment.
+A comprehensive Know Your Customer (KYC) analysis system built with LangChain and Ollama for confidential, local processing of client screenings.
 
-🔒 **Privacy First**: Supports local LLM processing with Ollama to ensure complete confidentiality of client data.
+🔒 **Privacy First**: 100% local LLM processing with Ollama to ensure complete confidentiality of client data.
 
-## Features
+## 🎯 Overview
 
-- **Confidential Web Research**: Uses headless browser technology to search for client information while maintaining privacy
-- **Local LLM Processing**: Run entirely offline with Ollama for maximum data security
-- **Advanced PEP Screening**: 
-  - Dynamic fetching from public PEP databases (OpenSanctions, EveryPolitician)
-  - Real-time web search for political connections
-  - News article analysis for PEP identification
-  - Fuzzy name matching and alias detection
-- **Sanctions Checking**: Screens against SECO, EU, OFAC, and UN sanctions lists
-- **Risk Assessment**: Comprehensive risk scoring based on multiple factors
-- **Automated Reporting**: Generates detailed KYC compliance reports
+This system performs automated KYC checks including:
+- **PEP (Politically Exposed Person) Screening** - Dynamic web search and database checks
+- **Sanctions List Checking** - OFAC, EU, SECO, UN sanctions screening
+- **Adverse Media Analysis** - Headless browser searches for negative news
+- **Risk Assessment** - Comprehensive scoring based on multiple factors
+- **Compliance Reporting** - Swiss banking standard reports
 
-## Architecture
+## 🚀 Quick Start
 
-The system uses CrewAI's multi-agent architecture with specialized agents:
+1. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-1. **Research Analyst**: Conducts online research using headless browsers
-2. **PEP Screening Specialist**: Checks PEP databases and identifies political connections
-3. **Sanctions Compliance Officer**: Screens against international sanctions lists
-4. **Risk Assessment Analyst**: Calculates comprehensive risk scores
-5. **Compliance Report Writer**: Compiles findings into regulatory-compliant reports
+2. **Ensure Ollama is Running**:
+   ```bash
+   # On Windows (if using WSL):
+   set OLLAMA_HOST=0.0.0.0
+   ollama serve
+   
+   # On Linux/Mac:
+   ollama serve
+   ```
 
-## Installation
+3. **Run the System**:
+   ```bash
+   python main.py
+   ```
 
-### Prerequisites
+## 📁 Project Structure
 
-- Python 3.8 or higher
-- Ollama (for local LLM processing)
+```
+swift-kyc/
+├── main.py                  # Main entry point with menu system
+├── kyc_enhanced.py          # Full multi-agent system (CrewAI functionality)
+├── kyc_interactive.py       # Interactive analysis with web search
+├── kyc_modern.py            # Modern streamlined implementation
+├── kyc_simple.py            # Simple basic implementation
+├── agents/                  # LangChain agents
+│   ├── research_agent.py
+│   ├── pep_agent.py
+│   ├── sanctions_agent.py
+│   ├── risk_agent.py
+│   ├── compliance_agent.py
+│   └── review_agent.py
+├── tools_langchain/         # Enhanced tools
+│   ├── enhanced_tools.py    # All CrewAI tool functionality
+│   └── __init__.py
+├── tools/                   # Simple tools
+│   ├── pep_tools.py
+│   ├── sanctions_tools.py
+│   └── risk_tools.py
+├── chains/                  # Workflow chains
+│   └── kyc_chains.py
+├── reports/                 # Generated reports
+├── logs/                    # System logs
+└── archive_crewai/          # Archived CrewAI files
+```
 
-### Step 1: Install Ollama
+## 🔧 Features
 
-For maximum confidentiality, we recommend using Ollama with local models:
+### 1. Enhanced Multi-Agent Analysis
+Full CrewAI functionality ported to LangChain with 6 specialized agents:
+- Research Agent - Background information gathering
+- PEP Screening Agent - Political exposure checks
+- Sanctions Screening Agent - Global sanctions lists
+- Risk Assessment Agent - Comprehensive risk scoring
+- Compliance Report Writer - Professional reports
+- Quality Review Agent - Final validation
 
-**macOS/Linux:**
+### 2. Interactive Analysis
+- Manual client input
+- Iterative web searches with full logging
+- Real-time search result review
+- Customizable search parameters
+
+### 3. Modern KYC Analysis
+- Streamlined single-agent approach
+- Efficient tool usage
+- Quick results with full compliance
+
+### 4. Simple KYC Analysis
+- Basic screening functionality
+- Minimal configuration required
+- Fast execution
+
+## 🛠️ Configuration
+
+### Ollama Settings
+For WSL users connecting to Windows Ollama:
 ```bash
-curl -fsSL https://ollama.ai/install.sh | sh
+export OLLAMA_BASE_URL=http://172.21.16.1:11434
 ```
 
-**Windows:**
-Download from [https://ollama.ai/download/windows](https://ollama.ai/download/windows)
+### Tool Configuration
+Tools can be configured in `tools_langchain/enhanced_tools.py`:
+- Adjust risk thresholds
+- Add custom PEP databases
+- Configure web search parameters
+- Set compliance standards
 
-### Step 2: Pull a Model
+## 📊 Output
 
-```bash
-# Start Ollama service
-ollama serve
+The system generates:
+- **JSON Reports** - Machine-readable results in `reports/`
+- **PDF Reports** - Professional compliance reports
+- **Logs** - Detailed execution logs in `logs/`
+- **Risk Scores** - Numerical risk assessments
 
-# In another terminal, pull a model (choose one):
-ollama pull llama2        # 7B parameters, good balance
-ollama pull mistral       # 7B parameters, faster
-ollama pull mixtral       # Larger, more capable
-ollama pull neural-chat   # Optimized for conversation
-```
+## 🔒 Security & Compliance
 
-### Step 3: Clone and Setup
+- **100% Local Processing** - No data leaves your infrastructure
+- **Swiss Banking Standards** - Compliant with Swiss KYC requirements
+- **Audit Trail** - Complete logging of all checks performed
+- **Confidential** - Uses Ollama for local LLM processing
 
-```bash
-# Clone the repository
-git clone <repository-url>
-cd swift-kyc
+## 🚨 Important Notes
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: .\venv\Scripts\Activate.ps1
+1. **Ollama Required**: Ensure Ollama is installed and running
+2. **Model**: Uses `mistral:latest` by default
+3. **Network**: For WSL users, configure Windows IP correctly
+4. **Performance**: First run may be slower as models load
 
-# Install dependencies
-pip install -r requirements.txt
+## 📝 Documentation
 
-# Install Playwright browsers
-playwright install chromium
+- `README_LANGCHAIN.md` - Detailed LangChain implementation
+- `INTERACTIVE_KYC_GUIDE.md` - Interactive system usage
+- `PROJECT_SUMMARY.md` - Complete project history
+- `CLEANUP_SUMMARY.json` - Migration details from CrewAI
 
-# Setup environment
-cp .env.example .env
-python setup.py
-```
+## 🤝 Contributing
 
-## Configuration
+This project was migrated from CrewAI to LangChain for better Ollama compatibility. All original functionality has been preserved and enhanced.
 
-Edit the `.env` file:
+## 📄 License
 
-```bash
-# Use Ollama for local processing (recommended)
-USE_OLLAMA=true
-OLLAMA_MODEL=llama2  # Choose your model
-OLLAMA_BASE_URL=http://localhost:11434
+Proprietary - For authorized use only
 
-# Only if you want to use OpenAI (not recommended for confidential data)
-# USE_OLLAMA=false
-# OPENAI_API_KEY=your_key_here
-```
+---
 
-## Usage
-
-### Basic Usage
-
-```python
-from main import KYCAnalysisCrew
-
-# Client information
-client_info = {
-    "name": "John Doe",
-    "entity_type": "individual",
-    "date_of_birth": "1980-05-15",
-    "nationality": "USA",
-    "residence_country": "Switzerland"
-}
-
-# Run KYC analysis
-kyc_crew = KYCAnalysisCrew()
-result = kyc_crew.run(client_info)
-```
-
-### Command Line
-
-```bash
-# Ensure Ollama is running
-ollama serve
-
-# In another terminal
-python main.py
-```
-
-### Example Usage
-
-```bash
-python example_usage.py
-```
-
-### Client Information Structure
-
-```python
-client_info = {
-    # Required fields
-    "name": "Full Name",
-    "entity_type": "individual",  # or "corporate"
-    
-    # Optional fields for individuals
-    "date_of_birth": "YYYY-MM-DD",
-    "nationality": "Country",
-    "residence_country": "Country",
-    
-    # Optional fields for corporates
-    "registration_number": "Company number",
-    "registration_country": "Country",
-    "business_countries": ["Country1", "Country2"],
-    
-    # Additional optional fields
-    "industry": "Industry sector",
-    "customer_type": "Type of customer",
-    "complex_structure": false,
-    "offshore_elements": false
-}
-```
-
-## Output
-
-The system generates comprehensive KYC reports saved in JSON format:
-
-```
-reports/
-├── KYC_Report_John_Doe_20240120_143022.json
-└── KYC_Report_Company_Ltd_20240120_150511.json
-```
-
-Each report contains:
-- Executive summary and recommendations
-- Background research findings
-- PEP screening results
-- Sanctions screening results
-- Risk assessment with detailed scoring
-- Required documentation checklist
-- Ongoing monitoring requirements
-
-## Privacy and Security
-
-### Using Ollama (Recommended)
-
-- **100% Local Processing**: All AI processing happens on your machine
-- **No Data Leakage**: Client information never leaves your infrastructure
-- **Compliance Ready**: Meets strict data protection requirements
-- **Air-gapped Operation**: Can run completely offline after initial setup
-
-### Security Best Practices
-
-1. Always use Ollama for production KYC processing
-2. Run on isolated, secure infrastructure
-3. Implement access controls for the reports directory
-4. Regularly update PEP and sanctions databases
-5. Maintain audit logs of all KYC checks
-
-## Model Selection Guide
-
-| Model | Size | Speed | Quality | Use Case |
-|-------|------|-------|---------|----------|
-| llama2 | 7B | Fast | Good | General KYC analysis |
-| mistral | 7B | Very Fast | Good | High-volume processing |
-| mixtral | 47B | Slower | Excellent | Complex cases |
-| neural-chat | 7B | Fast | Good | Interactive analysis |
-
-## PEP Database Management
-
-### Updating PEP Database
-
-The system can dynamically fetch PEP data from multiple public sources:
-
-```bash
-# Update PEP database from all sources
-python update_pep_database.py
-```
-
-### PEP Data Sources
-
-- **OpenSanctions**: Global sanctions and PEP data
-- **EveryPolitician**: Comprehensive political figure database
-- **News Sources**: Reuters, BBC, AP, Bloomberg
-- **Wikipedia**: Public figure information
-- **Government Sources**: Official sanctions lists
-
-### Manual PEP Database Update
-
-```python
-from update_pep_database import PEPDatabaseManager
-
-manager = PEPDatabaseManager()
-await manager.update_from_all_sources()
-```
-
-## Troubleshooting
-
-### Ollama Issues
-
-**Cannot connect to Ollama:**
-```bash
-# Check if Ollama is running
-curl http://localhost:11434/api/tags
-
-# Start Ollama
-ollama serve
-```
-
-**Model not found:**
-```bash
-# List available models
-ollama list
-
-# Pull required model
-ollama pull llama2
-```
-
-### Performance Optimization
-
-For faster processing with Ollama:
-```bash
-# Use GPU acceleration (if available)
-ollama serve --gpu
-
-# Adjust context size in .env
-OLLAMA_NUM_CTX=2048  # Reduce for faster processing
-```
-
-### Common Issues
-
-1. **Browser timeout errors**: Increase `BROWSER_TIMEOUT` in `.env`
-2. **Out of memory**: Use a smaller model or reduce context size
-3. **Slow processing**: Consider using Mistral or reducing the number of agents
-
-## Customization
-
-### Adding New Sanctions Lists
-
-Edit `tools/sanctions_tools.py`:
-```python
-self.sanctions_data['lists']['NEW_LIST'] = {
-    "entries": [...],
-    "last_updated": "2024-01-20"
-}
-```
-
-### Modifying Risk Scoring
-
-Adjust risk weights in `tools/risk_assessment_tools.py`:
-```python
-self.risk_weights = {
-    'geographic': 0.25,
-    'customer_type': 0.20,
-    'pep_status': 0.20,
-    'sanctions': 0.15,
-    'negative_news': 0.10,
-    'business_activity': 0.10
-}
-```
-
-## Compliance
-
-This tool is designed to assist with KYC compliance for Swiss banking regulations but should be used as part of a comprehensive compliance program. Always ensure:
-
-- Regular updates to PEP and sanctions databases
-- Human review of high-risk cases
-- Compliance with local regulatory requirements
-- Proper documentation and audit trails
-
-## License
-
-[Your License Here]
-
-## Support
-
-For issues and questions:
-- Create an issue in the repository
-- Contact: [your-email@example.com]
+Built with ❤️ using LangChain and Ollama for secure, local KYC processing.
