@@ -25,19 +25,16 @@ class SanctionsCheckTool(BaseTool):
     """
     args_schema: type[BaseModel] = SanctionsCheckInput
 
-    def __init__(self):
-        super().__init__()
-        self.sanctions_path = os.getenv("SANCTIONS_LIST_PATH", "./data/sanctions_lists.json")
-        self._load_sanctions_data()
-
-    def _load_sanctions_data(self):
+    def _load_sanctions_data(self) -> Dict:
         """Load sanctions data from file or initialize with sample data"""
-        if os.path.exists(self.sanctions_path):
-            with open(self.sanctions_path, 'r') as f:
-                self.sanctions_data = json.load(f)
+        sanctions_path = os.getenv("SANCTIONS_LIST_PATH", "./data/sanctions_lists.json")
+        
+        if os.path.exists(sanctions_path):
+            with open(sanctions_path, 'r') as f:
+                return json.load(f)
         else:
             # Initialize with sample sanctions data
-            self.sanctions_data = {
+            sanctions_data = {
                 "lists": {
                     "OFAC": {
                         "entries": [
@@ -79,6 +76,15 @@ class SanctionsCheckTool(BaseTool):
                 },
                 "version": "1.0"
             }
+            
+            # Create directory if needed
+            os.makedirs(os.path.dirname(sanctions_path), exist_ok=True)
+            
+            # Save default data
+            with open(sanctions_path, 'w') as f:
+                json.dump(sanctions_data, f, indent=2)
+            
+            return sanctions_data
 
     def _normalize_name(self, name: str) -> str:
         """Normalize name for comparison"""
@@ -111,11 +117,11 @@ class SanctionsCheckTool(BaseTool):
 
     def _check_sanctions_lists(self, name: str, entity_type: str, 
                              date_of_birth: Optional[str], country: Optional[str],
-                             fuzzy_threshold: float) -> List[Dict]:
+                             fuzzy_threshold: float, sanctions_data: Dict) -> List[Dict]:
         """Check all sanctions lists for matches"""
         all_matches = []
         
-        for list_name, list_data in self.sanctions_data['lists'].items():
+        for list_name, list_data in sanctions_data['lists'].items():
             for entry in list_data.get('entries', []):
                 # Skip if entity type doesn't match
                 if entry.get('type') != entity_type:
@@ -157,9 +163,12 @@ class SanctionsCheckTool(BaseTool):
              date_of_birth: Optional[str] = None, country: Optional[str] = None,
              fuzzy_threshold: float = 0.85) -> str:
         
+        # Load sanctions data
+        sanctions_data = self._load_sanctions_data()
+        
         # Perform sanctions check
         matches = self._check_sanctions_lists(
-            name, entity_type, date_of_birth, country, fuzzy_threshold
+            name, entity_type, date_of_birth, country, fuzzy_threshold, sanctions_data
         )
         
         # Determine overall status
@@ -190,7 +199,7 @@ class SanctionsCheckTool(BaseTool):
             'risk_level': risk_level,
             'total_matches': len(matches),
             'matches': matches[:10],  # Top 10 matches
-            'lists_checked': list(self.sanctions_data['lists'].keys()),
+            'lists_checked': list(sanctions_data['lists'].keys()),
             'recommendation': self._get_recommendation(status, matches)
         }
         

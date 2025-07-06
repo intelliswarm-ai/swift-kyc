@@ -9,7 +9,7 @@ class RiskAssessmentInput(BaseModel):
     client_data: Dict = Field(..., description="Complete client information and findings")
     pep_status: str = Field(..., description="PEP screening result")
     sanctions_status: str = Field(..., description="Sanctions screening result")
-    negative_news: Optional[List[str]] = Field([], description="List of negative news findings")
+    negative_news: Optional[List[str]] = Field(default_factory=list, description="List of negative news findings")
 
 
 class RiskAssessmentTool(BaseTool):
@@ -21,9 +21,9 @@ class RiskAssessmentTool(BaseTool):
     """
     args_schema: type[BaseModel] = RiskAssessmentInput
 
-    def __init__(self):
-        super().__init__()
-        self.risk_weights = {
+    def _get_risk_weights(self) -> Dict[str, float]:
+        """Get risk calculation weights"""
+        return {
             'geographic': 0.25,
             'customer_type': 0.20,
             'pep_status': 0.20,
@@ -31,8 +31,10 @@ class RiskAssessmentTool(BaseTool):
             'negative_news': 0.10,
             'business_activity': 0.10
         }
-        
-        self.country_risk_scores = {
+    
+    def _get_country_risk_scores(self) -> Dict[str, List[str]]:
+        """Get country risk classifications"""
+        return {
             'high_risk': ['Iran', 'North Korea', 'Syria', 'Myanmar', 'Afghanistan'],
             'medium_risk': ['Russia', 'Pakistan', 'Turkey', 'UAE', 'China'],
             'low_risk': ['Switzerland', 'UK', 'Germany', 'Canada', 'Australia']
@@ -40,6 +42,7 @@ class RiskAssessmentTool(BaseTool):
 
     def _calculate_geographic_risk(self, client_data: Dict) -> Dict:
         """Calculate risk based on geographic factors"""
+        country_risk_scores = self._get_country_risk_scores()
         countries = []
         
         # Extract countries from client data
@@ -55,13 +58,13 @@ class RiskAssessmentTool(BaseTool):
         risk_countries = []
         
         for country in countries:
-            if country in self.country_risk_scores['high_risk']:
+            if country in country_risk_scores['high_risk']:
                 max_risk = max(max_risk, 1.0)
                 risk_countries.append((country, 'High'))
-            elif country in self.country_risk_scores['medium_risk']:
+            elif country in country_risk_scores['medium_risk']:
                 max_risk = max(max_risk, 0.6)
                 risk_countries.append((country, 'Medium'))
-            elif country in self.country_risk_scores['low_risk']:
+            elif country in country_risk_scores['low_risk']:
                 max_risk = max(max_risk, 0.2)
                 risk_countries.append((country, 'Low'))
             else:
@@ -175,9 +178,10 @@ class RiskAssessmentTool(BaseTool):
 
     def _calculate_overall_risk(self, risk_components: Dict) -> Dict:
         """Calculate overall risk score and classification"""
+        risk_weights = self._get_risk_weights()
         weighted_score = 0
         
-        for component, weight in self.risk_weights.items():
+        for component, weight in risk_weights.items():
             if component in risk_components:
                 weighted_score += risk_components[component]['score'] * weight
         

@@ -1,9 +1,9 @@
 import os
 import asyncio
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, ClassVar
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
-from crewai_tools import BaseTool
+from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 import json
 from datetime import datetime
@@ -27,18 +27,17 @@ class HeadlessBrowserTool(BaseTool):
     while maintaining privacy and avoiding tracking.
     """
     args_schema: type[BaseModel] = BrowserSearchInput
-
-    def __init__(self):
-        super().__init__()
-        self.ua = UserAgent()
-        self.search_urls = {
-            "duckduckgo": "https://duckduckgo.com/?q={query}",
-            "bing": "https://www.bing.com/search?q={query}",
-            "startpage": "https://www.startpage.com/search?q={query}"
-        }
+    
+    # Class variables for tool configuration
+    search_urls: ClassVar[Dict[str, str]] = {
+        "duckduckgo": "https://duckduckgo.com/?q={query}",
+        "bing": "https://www.bing.com/search?q={query}",
+        "startpage": "https://www.startpage.com/search?q={query}"
+    }
 
     async def _search_with_browser(self, query: str, max_results: int, search_engines: List[str]) -> List[Dict]:
         results = []
+        ua = UserAgent()
         
         async with async_playwright() as p:
             browser = await p.chromium.launch(
@@ -56,7 +55,7 @@ class HeadlessBrowserTool(BaseTool):
             )
             
             context = await browser.new_context(
-                user_agent=self.ua.random,
+                user_agent=ua.random,
                 viewport={'width': 1920, 'height': 1080},
                 locale='en-US',
                 timezone_id='America/New_York',

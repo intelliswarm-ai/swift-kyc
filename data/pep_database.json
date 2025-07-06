@@ -1,0 +1,85 @@
+{
+  "version": "2.0",
+  "last_updated": "2025-07-06T22:48:28.124766",
+  "peps": [
+    {
+      "id": "PEP001",
+      "name": "Angela Merkel",
+      "aliases": [
+        "A. Merkel",
+        "Angela Dorothea Merkel"
+      ],
+      "date_of_birth": "1954-07-17",
+      "nationality": "Germany",
+      "positions": [
+        {
+          "title": "Chancellor of Germany",
+          "country": "Germany",
+          "start_date": "2005-11-22",
+          "end_date": "2021-12-08",
+          "current": false
+        }
+      ],
+      "family_members": [
+        {
+          "name": "Joachim Sauer",
+          "relationship": "Spouse"
+        }
+      ],
+      "risk_level": "High",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "id": "PEP002",
+      "name": "Emmanuel Macron",
+      "aliases": [
+        "E. Macron"
+      ],
+      "date_of_birth": "1977-12-21",
+      "nationality": "France",
+      "positions": [
+        {
+          "title": "President of France",
+          "country": "France",
+          "start_date": "2017-05-14",
+          "end_date": null,
+          "current": true
+        }
+      ],
+      "family_members": [
+        {
+          "name": "Brigitte Macron",
+          "relationship": "Spouse"
+        }
+      ],
+      "risk_level": "High",
+      "last_updated": "2024-01-15"
+    },
+    {
+      "id": "PEP003",
+      "name": "Xi Jinping",
+      "aliases": [
+        "Xi Jin-ping"
+      ],
+      "date_of_birth": "1953-06-15",
+      "nationality": "China",
+      "positions": [
+        {
+          "title": "President of China",
+          "country": "China",
+          "start_date": "2013-03-14",
+          "end_date": null,
+          "current": true
+        }
+      ],
+      "family_members": [
+        {
+          "name": "Peng Liyuan",
+          "relationship": "Spouse"
+        }
+      ],
+      "risk_level": "High",
+      "last_updated": "2024-01-15"
+    }
+  ]
+}

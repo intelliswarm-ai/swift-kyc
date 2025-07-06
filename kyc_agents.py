@@ -2,15 +2,18 @@ from crewai import Agent
 from textwrap import dedent
 from typing import Union
 from langchain_openai import ChatOpenAI
-from langchain_community.llms import Ollama
+try:
+    from langchain_ollama import OllamaLLM
+except ImportError:
+    from langchain_community.llms import Ollama as OllamaLLM
 from tools.browser_tools import HeadlessBrowserTool
-from tools.pep_tools import PEPCheckTool
-from tools.sanctions_tools import SanctionsCheckTool
-from tools.risk_assessment_tools import RiskAssessmentTool
+from tools.pep_tools_simple import PEPCheckTool
+from tools.sanctions_tools_simple import SanctionsCheckTool
+from tools.risk_assessment_tools_simple import RiskAssessmentTool
 
 
 class KYCAgents:
-    def __init__(self, llm: Union[ChatOpenAI, Ollama] = None):
+    def __init__(self, llm: Union[ChatOpenAI, OllamaLLM] = None):
         self.llm = llm
         self.browser_tool = HeadlessBrowserTool()
         self.pep_tool = PEPCheckTool()

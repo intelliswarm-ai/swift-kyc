@@ -4,7 +4,7 @@ import asyncio
 import aiohttp
 import requests
 from typing import Dict, List, Optional, Tuple
-from crewai_tools import BaseTool
+from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 from datetime import datetime, timedelta
 import re

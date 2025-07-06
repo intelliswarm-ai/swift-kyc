@@ -1,0 +1,75 @@
+{
+  "version": "2.0",
+  "last_updated": "2025-07-06T22:48:28.124766",
+  "lists": {
+    "OFAC": {
+      "entries": [
+        {
+          "id": "OFAC-001",
+          "name": "Cyber Criminal Organization LLC",
+          "type": "entity",
+          "aliases": [
+            "CCO LLC",
+            "Cyber Crim Org"
+          ],
+          "sanctions_program": "CYBER2",
+          "listing_date": "2023-06-15",
+          "country": "Russia",
+          "additional_info": "Ransomware operations"
+        },
+        {
+          "id": "OFAC-002",
+          "name": "Vladimir Petrov",
+          "type": "individual",
+          "date_of_birth": "1975-03-10",
+          "sanctions_program": "UKRAINE-EO14024",
+          "listing_date": "2022-02-25",
+          "nationality": "Russia",
+          "additional_info": "Oligarch"
+        }
+      ],
+      "last_updated": "2024-01-20"
+    },
+    "EU": {
+      "entries": [
+        {
+          "id": "EU-001",
+          "name": "Arms Trading International",
+          "type": "entity",
+          "sanctions_program": "Arms Embargo",
+          "listing_date": "2023-01-15",
+          "country": "Iran",
+          "additional_info": "Weapons trafficking"
+        }
+      ],
+      "last_updated": "2024-01-18"
+    },
+    "SECO": {
+      "entries": [
+        {
+          "id": "SECO-001",
+          "name": "Money Laundering Services AG",
+          "type": "entity",
+          "sanctions_program": "ML/TF",
+          "listing_date": "2023-09-01",
+          "country": "Switzerland",
+          "additional_info": "Financial crimes"
+        }
+      ],
+      "last_updated": "2024-01-19"
+    },
+    "UN": {
+      "entries": [
+        {
+          "id": "UN-001",
+          "name": "Terror Finance Network",
+          "type": "entity",
+          "sanctions_program": "ISIL and Al-Qaida",
+          "listing_date": "2022-11-30",
+          "additional_info": "Terrorist financing"
+        }
+      ],
+      "last_updated": "2024-01-17"
+    }
+  }
+}

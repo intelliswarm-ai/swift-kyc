@@ -3,19 +3,15 @@ import os
 import json
 import warnings
 from datetime import datetime
-from typing import Dict, Optional, Union
+from typing import Dict, Optional
 from crewai import Crew, Process
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
-# Suppress the deprecation warning temporarily
-warnings.filterwarnings("ignore", category=DeprecationWarning, module="langchain")
+# Suppress deprecation warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-try:
-    from langchain_ollama import OllamaLLM
-except ImportError:
-    # Fallback to the deprecated import if the new package isn't installed
-    from langchain_community.llms import Ollama as OllamaLLM
+from langchain_community.llms import Ollama
 
 from kyc_agents import KYCAgents
 from kyc_tasks import KYCTasks
@@ -27,33 +23,28 @@ load_dotenv()
 class KYCAnalysisCrew:
     """KYC Analysis Crew for comprehensive client due diligence"""
     
-    def __init__(self, llm: Optional[Union[ChatOpenAI, OllamaLLM]] = None):
+    def __init__(self, llm=None):
         """Initialize the KYC Analysis Crew"""
         self.llm = llm or self._get_llm()
         self.agents = KYCAgents(self.llm)
         self.tasks = KYCTasks()
         
-    def _get_llm(self) -> Union[ChatOpenAI, OllamaLLM]:
+    def _get_llm(self):
         """Get the configured LLM (Ollama or OpenAI)"""
         use_ollama = os.getenv("USE_OLLAMA", "true").lower() == "true"
         
         if use_ollama:
-            # Use Ollama for local processing
+            # Use Ollama for local processing with minimal parameters
             model_name = os.getenv("OLLAMA_MODEL", "llama2")
             base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
             
             print(f"🔒 Using Ollama ({model_name}) for confidential local processing")
             
-            return OllamaLLM(
+            # Simplified Ollama configuration
+            return Ollama(
                 model=model_name,
                 base_url=base_url,
-                temperature=0,
-                # Additional parameters for better performance
-                num_ctx=4096,  # Context window
-                num_predict=2048,  # Max tokens to generate
-                top_k=10,
-                top_p=0.95,
-                repeat_penalty=1.1
+                temperature=0
             )
         else:
             # Fallback to OpenAI if explicitly disabled
@@ -66,25 +57,7 @@ class KYCAnalysisCrew:
             )
     
     def run(self, client_info: Dict) -> Dict:
-        """
-        Run the KYC analysis for a client
-        
-        Args:
-            client_info: Dictionary containing client information
-                Required fields:
-                - name: Full name
-                - entity_type: 'individual' or 'corporate'
-                Optional fields:
-                - date_of_birth: YYYY-MM-DD format
-                - nationality: Country
-                - residence_country: Current residence
-                - business_countries: List of countries
-                - industry: Business industry
-                - customer_type: Type of customer
-        
-        Returns:
-            Dictionary containing the complete KYC analysis results
-        """
+        """Run the KYC analysis for a client"""
         
         # Validate required fields
         if 'name' not in client_info:
@@ -108,7 +81,7 @@ class KYCAnalysisCrew:
         pep_task = self.tasks.screen_pep_status(
             pep_agent,
             json.dumps(client_info, indent=2),
-            "{research_findings}"  # Will be populated by crew
+            "{research_findings}"
         )
         
         sanctions_task = self.tasks.check_sanctions_lists(
@@ -119,16 +92,16 @@ class KYCAnalysisCrew:
         risk_task = self.tasks.assess_client_risk(
             risk_agent,
             json.dumps(client_info, indent=2),
-            "{all_findings}"  # Will be populated by crew
+            "{all_findings}"
         )
         
         compliance_task = self.tasks.compile_kyc_report(
             compliance_agent,
             json.dumps(client_info, indent=2),
-            "{all_assessments}"  # Will be populated by crew
+            "{all_assessments}"
         )
         
-        # Create and run the crew
+        # Create and run the crew with error handling
         crew = Crew(
             agents=[
                 research_agent,
@@ -145,23 +118,36 @@ class KYCAnalysisCrew:
                 compliance_task
             ],
             process=Process.sequential,
-            verbose=True
+            verbose=True,
+            max_iter=3  # Limit iterations to prevent infinite loops
         )
         
-        # Execute the crew
-        result = crew.kickoff()
-        
-        # Save the report
-        self._save_report(client_info['name'], result)
-        
-        return {
-            'status': 'completed',
-            'timestamp': datetime.now().isoformat(),
-            'client': client_info,
-            'report': result
-        }
+        try:
+            # Execute the crew
+            result = crew.kickoff()
+            
+            # Save the report
+            self._save_report(client_info['name'], result)
+            
+            return {
+                'status': 'completed',
+                'timestamp': datetime.now().isoformat(),
+                'client': client_info,
+                'report': result
+            }
+        except Exception as e:
+            print(f"\n⚠️  Error during crew execution: {str(e)}")
+            
+            # Return partial result
+            return {
+                'status': 'partial',
+                'timestamp': datetime.now().isoformat(),
+                'client': client_info,
+                'error': str(e),
+                'report': 'Analysis could not be completed due to an error.'
+            }
     
-    def _save_report(self, client_name: str, report_content: str):
+    def _save_report(self, client_name: str, report_content):
         """Save the KYC report to file"""
         report_dir = os.getenv("REPORT_OUTPUT_DIR", "./reports")
         os.makedirs(report_dir, exist_ok=True)
@@ -173,14 +159,36 @@ class KYCAnalysisCrew:
         
         filepath = os.path.join(report_dir, filename)
         
-        with open(filepath, 'w') as f:
-            json.dump({
+        # Handle both string and object report content
+        if isinstance(report_content, str):
+            report_data = {
                 'timestamp': datetime.now().isoformat(),
                 'client_name': client_name,
                 'report': report_content
-            }, f, indent=2)
+            }
+        else:
+            report_data = {
+                'timestamp': datetime.now().isoformat(),
+                'client_name': client_name,
+                'report': str(report_content)
+            }
+        
+        with open(filepath, 'w') as f:
+            json.dump(report_data, f, indent=2)
         
         print(f"\nReport saved to: {filepath}")
+
+
+def test_ollama_connection():
+    """Test if Ollama is properly configured"""
+    try:
+        ollama = Ollama(model="llama2", base_url="http://localhost:11434")
+        response = ollama.invoke("Hello, are you working?")
+        print(f"✅ Ollama test successful. Response: {response[:100]}...")
+        return True
+    except Exception as e:
+        print(f"❌ Ollama test failed: {str(e)}")
+        return False
 
 
 def main():
@@ -196,6 +204,12 @@ def main():
                 models = response.json().get('models', [])
                 if models:
                     print(f"✅ Ollama is running with models: {[m['name'] for m in models]}")
+                    
+                    # Test Ollama connection
+                    print("\nTesting Ollama connection...")
+                    if not test_ollama_connection():
+                        print("\n⚠️  Ollama connection test failed. Please check your setup.")
+                        return
                 else:
                     print("⚠️  Ollama is running but no models found. Run: ollama pull llama2")
                     return
@@ -230,12 +244,21 @@ def main():
     
     try:
         result = kyc_crew.run(client_info)
-        print("\n✅ KYC Analysis completed successfully!")
+        
+        if result['status'] == 'completed':
+            print("\n✅ KYC Analysis completed successfully!")
+        else:
+            print("\n⚠️  KYC Analysis completed with errors")
+            
         print(f"Report saved to: {os.getenv('REPORT_OUTPUT_DIR', './reports')}")
         
     except Exception as e:
         print(f"\n❌ Error during KYC analysis: {str(e)}")
-        raise
+        print("\nTroubleshooting tips:")
+        print("1. Ensure Ollama is running: ollama serve")
+        print("2. Try a different model: export OLLAMA_MODEL=mistral")
+        print("3. Check if the model supports the required context length")
+        print("4. Consider using OpenAI by setting USE_OLLAMA=false in .env")
 
 
 if __name__ == "__main__":
