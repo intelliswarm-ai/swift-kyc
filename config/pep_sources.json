@@ -1,0 +1,155 @@
+{
+  "sources": {
+    "opensanctions": {
+      "name": "OpenSanctions",
+      "type": "api",
+      "enabled": true,
+      "description": "Comprehensive sanctions and PEP database",
+      "endpoints": {
+        "search": "https://api.opensanctions.org/search/{name}",
+        "entity": "https://api.opensanctions.org/entities/{id}",
+        "dataset": "https://api.opensanctions.org/datasets/default/"
+      },
+      "rate_limit": {
+        "requests_per_minute": 60,
+        "concurrent_requests": 5
+      },
+      "categories": ["pep", "sanctions", "crime"]
+    },
+    "everypolitician": {
+      "name": "EveryPolitician",
+      "type": "api",
+      "enabled": true,
+      "description": "Global database of politicians",
+      "endpoints": {
+        "countries": "http://everypolitician.org/api/v0.1/countries.json",
+        "persons": "http://everypolitician.org/api/v0.1/persons/{country}/{legislature}.json"
+      },
+      "rate_limit": {
+        "requests_per_minute": 30,
+        "concurrent_requests": 3
+      }
+    },
+    "world_bank": {
+      "name": "World Bank Debarred Entities",
+      "type": "api",
+      "enabled": true,
+      "description": "Firms and individuals debarred by World Bank",
+      "endpoints": {
+        "debarred": "https://apigwext.worldbank.org/dvsvc/v1.0/json/APPLICATION/ADOBE_EXPRNCE_MGR/FIRM/SANCTIONED_FIRM"
+      },
+      "rate_limit": {
+        "requests_per_minute": 20,
+        "concurrent_requests": 2
+      }
+    },
+    "news_aggregators": {
+      "name": "News Aggregators",
+      "type": "web_scraping",
+      "enabled": true,
+      "description": "Search news for political connections",
+      "sites": [
+        {
+          "name": "Reuters",
+          "search_url": "https://www.reuters.com/search/news?blob={query}",
+          "selectors": {
+            "results": "div.search-result-content",
+            "title": "h3.search-result-title",
+            "snippet": "div.search-result-excerpt"
+          }
+        },
+        {
+          "name": "BBC",
+          "search_url": "https://www.bbc.com/search?q={query}+politician",
+          "selectors": {
+            "results": "article",
+            "title": "h2",
+            "snippet": "p"
+          }
+        },
+        {
+          "name": "Associated Press",
+          "search_url": "https://apnews.com/search?q={query}+political",
+          "selectors": {
+            "results": "div.SearchResultsModule-results",
+            "title": "h3",
+            "snippet": "div.content"
+          }
+        },
+        {
+          "name": "Bloomberg",
+          "search_url": "https://www.bloomberg.com/search?query={query}+minister+senator",
+          "selectors": {
+            "results": "article.search-result",
+            "title": "h3",
+            "snippet": "div.summary"
+          }
+        }
+      ],
+      "political_keywords": [
+        "minister", "senator", "congressman", "congresswoman",
+        "parliament", "deputy", "governor", "mayor",
+        "president", "prime minister", "chancellor",
+        "ambassador", "secretary", "commissioner",
+        "councillor", "legislator", "representative",
+        "chairman", "chairwoman", "director general",
+        "attorney general", "chief justice", "judge"
+      ]
+    },
+    "government_websites": {
+      "name": "Government Websites",
+      "type": "web_scraping",
+      "enabled": true,
+      "description": "Official government sources",
+      "sites": [
+        {
+          "name": "US Treasury OFAC",
+          "url": "https://sanctionssearch.ofac.treas.gov/",
+          "type": "search_form"
+        },
+        {
+          "name": "UK Sanctions List",
+          "url": "https://www.gov.uk/government/publications/the-uk-sanctions-list",
+          "type": "downloadable_list"
+        },
+        {
+          "name": "EU Sanctions Map",
+          "url": "https://www.sanctionsmap.eu/",
+          "type": "interactive_map"
+        }
+      ]
+    },
+    "wikipedia": {
+      "name": "Wikipedia",
+      "type": "api",
+      "enabled": true,
+      "description": "Encyclopedia for public figures",
+      "endpoints": {
+        "search": "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={query}&format=json",
+        "page": "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro&titles={title}&format=json"
+      },
+      "political_categories": [
+        "Category:Heads of state",
+        "Category:Government ministers",
+        "Category:Members of parliament",
+        "Category:Senators",
+        "Category:Mayors",
+        "Category:Ambassadors",
+        "Category:Political office-holders"
+      ]
+    }
+  },
+  "update_schedule": {
+    "opensanctions": "daily",
+    "everypolitician": "weekly",
+    "world_bank": "monthly",
+    "news_aggregators": "on_demand",
+    "government_websites": "weekly",
+    "wikipedia": "on_demand"
+  },
+  "data_retention": {
+    "cache_duration_days": 7,
+    "archive_after_days": 30,
+    "delete_after_days": 365
+  }
+}
